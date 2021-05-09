@@ -1,3 +1,4 @@
 C:/Users/KYRIAKOS[[:space:]]ARISTIDOU/Desktop/Thesis_Project/YOLOv4 filter=lfs diff=lfs merge=lfs -text
 C:/Users/KYRIAKOS[[:space:]]ARISTIDOU/Desktop/Thesis_Project/YOLOv4 filter=lfs diff=lfs merge=lfs -text
 YOLOv4 filter=lfs diff=lfs merge=lfs -text
+YOLOv4/yolov4-obj_final.weights filter=lfs diff=lfs merge=lfs -text
