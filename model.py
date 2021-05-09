@@ -8,7 +8,6 @@ import shutil
 import glob
 import tensorflow as tf
 import streamlit as st
-import altair as alt
 import pandas as pd
 import numpy as np
 from itertools import combinations
@@ -19,8 +18,6 @@ import urllib
 import cv2 as cv
 import tempfile
 from PIL import Image
-import plotly.graph_objs as go
-from matplotlib.pyplot import figure
 import matplotlib
 import matplotlib.pyplot as plt
 plt.rcdefaults()
