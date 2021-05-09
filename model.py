@@ -6,11 +6,9 @@ import colorsys
 import random
 import shutil
 import glob
-import tensorflow as tf
 import streamlit as st
 import pandas as pd
 import numpy as np
-from itertools import combinations
 from scipy.spatial.distance import cdist
 import math
 import os
