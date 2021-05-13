@@ -141,7 +141,7 @@ def main():
                     violationsnumbers[1] += 1
                     mAPperson.append(confidences[i])
 
-        #Here check if the distance is violated
+        #Here is checking if the distance is violated
         if len(results) >= 2:
             centroids = np.array([r[2] for r in results])
             D = cdist(centroids, centroids, metric="euclidean")
@@ -305,7 +305,7 @@ def main():
                     continue
 
         return boxes, confidences, class_IDs, indices, results #return the predicted boxes with labels,confidences
-    #check if the user selected image or video
+    #checking if the user select image or video
     if session_state.name == "":
         st.subheader("Please select a folder")
     else:
@@ -347,7 +347,7 @@ def main():
                 time.sleep(30) # this give time to the system for delete the content of the folder and then go for the loop
              #Here is the case if user select Video   
             elif choice1 == 'Video':
-                #check for each video in the folder with specific video type(mp4)
+                #checking for each video in the folder with specific video type(mp4)
                 for e in ext:
                     videofiles.extend(glob.glob(mkdir + '/*.' + e))
 
