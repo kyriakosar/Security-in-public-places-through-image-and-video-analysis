@@ -20,10 +20,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 plt.rcdefaults()
 
-
-# st.title("Image or Video Upload for detection")
-# st.sidebar.markdown("YOLOv4 model Object Detection")
-
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
@@ -35,6 +31,7 @@ def main():
     # # Make folder picker dialog appear on top of other windows
     root.wm_attributes('-topmost', 1)
 
+    #Sidebar selected options
     file_type1 = ["Not selected", "SOCIAL DISTANCING / MASK"]
     file_type = ["Image", "Video"]
 
@@ -44,12 +41,15 @@ def main():
         choice1 = st.sidebar.text("VIDEO FILE REQUIRED")
     else:
         choice1 = st.sidebar.selectbox("File type", file_type)
+
+    #initilize values
     dirname = ""
     mkdir = ""
     count = 0
     t = 0
     MIN_DISTANCE = 50
 
+    # create sessions for avoid clear memory(cache) when option selected
     session_state = SessionState.get(name='')
 
     if st.sidebar.button("Select folder"):
@@ -57,10 +57,11 @@ def main():
             'Selected folder:', filedialog.askdirectory(master=root))
         session_state.name = dirname
 
+    #the valid formats for videos and images
     ext = ['png', 'jpg', 'jfif', 'avi', 'mp4',
            ]    # Add image formats here
     mkdir = session_state.name
-    # files = []
+  
     videofiles = []
 
     # Map from YOLO labels to Udacity labels.
@@ -76,6 +77,8 @@ def main():
     # Create a list of colors for the labels
     colors = np.random.randint(0, 255, size=(
         len(UDACITY_LABELS), 3), dtype='uint8')
+
+        #this function calulate the mAP(mean Average Precision) for the detections
     def calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson):
         a1 = len(mAPpistol)
         b1 = sum(mAPpistol)
@@ -115,11 +118,12 @@ def main():
 
         return a, b , c , d , e, f
 
-
+   # this function find if the social distancing is violated
     def cvDrawBoxes(results, violate, idxs, boxes, classIDs, img, violationsnumbers, mAPmask, mAPperson,v):   
         
         if len(idxs) > 0:
             for i in idxs.flatten():
+                #if the boxes are mask draw the mask bounding boxes
                 if UDACITY_LABELS[classIDs[i]] =='mask':
                     violationsnumbers[0] += 1
                     mAPmask.append(confidences[i])
@@ -136,7 +140,8 @@ def main():
                 if UDACITY_LABELS[classIDs[i]] =='person':
                     violationsnumbers[1] += 1
                     mAPperson.append(confidences[i])
-        
+
+        #Here check if the distance is violated
         if len(results) >= 2:
             centroids = np.array([r[2] for r in results])
             D = cdist(centroids, centroids, metric="euclidean")
@@ -153,7 +158,7 @@ def main():
             
                 if i in violate:
                     color = (0, 0, 255)
-                    
+                #Every time that distance is violated draw the 2 points(centroid) with red color    
                 cv.rectangle(img, (startX, startY), (endX, endY), color, 2)
                 cv.circle(img, (cX, cY), 5, color, 1)
             text = "Social Distancing Violations: {}".format(len(violate))
@@ -161,7 +166,7 @@ def main():
             v.append(len(violate))    
         im = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         return im       
-
+    #this function is use for graphs
     def graph(violationsnumbers):
         objects = ('No-Detection', 'Pistol', 'Fire', 'Smoke', 'No-Mask', 'Mask' )
         y_pos = np.arange(len(objects))
@@ -172,13 +177,12 @@ def main():
         plt.barh(y_pos, performance, align='center', alpha=1,
                     color=['yellow','green', 'red', 'gray', 'blue','magenta'])
         plt.yticks(y_pos, objects)
-        # ax.plot(y_pos, performance)
         ax.set_ylabel('Violations Rules')
         ax.set_xlabel('Violations in numbers')
-        #plt.xlabel('Violations')
         plt.title('Violations bar chart')
         st.pyplot(fig)
 
+     # this function drawing the bounding boxes on the image or for each frame if is a video
     def draw_image_with_boxes(image, boxes, confidences, classIDs, idxs, colors, t, violationsnumbers, mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson):
         text =""
         if len(idxs) > 0:
@@ -202,6 +206,7 @@ def main():
                 img = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 im = Image.fromarray(img.astype(np.uint8))       
                 im.save('./nodetections/nodetection(%d).png' % t)
+            # this else, collected the detections so that can use for graphs and statistics(if is image)   
             else:
                 if 'pistol' in text:
                     violationsnumbers[0] += 1
@@ -224,6 +229,7 @@ def main():
                 img = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 im = Image.fromarray(img.astype(np.uint8))       
                 im.save('./detections/detection(%d).png' % t)
+         # this else, collected the detections so that can use for graphs and statistics( if is video(frame by frame))         
         elif choice1 == 'Video':
                 if 'pistol' in text:
                     violationsnumbers[0] += 1
@@ -246,7 +252,7 @@ def main():
                 im = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 return im   
         
-
+    #This function is used for deploy yolov4
     def yolo_v4(image, confidence_threshold=0.45, overlap_threshold=0.25):
         # Load the network. Because this is cached it will only happen once.
         @st.cache(allow_output_mutation=True)
@@ -257,7 +263,7 @@ def main():
                                   for i in net.getUnconnectedOutLayers()]
             return net, output_layer_names
         net, output_layer_names = load_network(
-            "YOLOv4/yolov4-obj.cfg", "YOLOv4/yolov4-obj_final.weights")
+            "YOLOv4/yolov4-obj.cfg", "YOLOv4/yolov4-obj_final.weights") #the pre-trained weights and the cfg file
 
         # Run the YOLO neural net.
         blob = cv.dnn.blobFromImage(
@@ -298,31 +304,28 @@ def main():
                 if label is None:
                     continue
 
-        return boxes, confidences, class_IDs, indices, results
+        return boxes, confidences, class_IDs, indices, results #return the predicted boxes with labels,confidences
+    #check if the user selected image or video
     if session_state.name == "":
         st.subheader("Please select a folder")
     else:
         st.subheader("Please be patient the detection is running..") 
+        #initialize lists for statistics
         violationsnumbers = [0, 0, 0, 0, 0, 0, 0]
         mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson = [], [], [], [], [], []
+        #while the folder is not empty do the loop
         while len(os.listdir(dirname)) != 0:
             count += 1
-            # if st.sidebar.button('Terminate the app',count):
-           #     app = False
-            #     break
-           # count += 1
             files = []
             images = []
             t = 0
+            #Here is the case if user select Image
             if choice1 == 'Image':
                 for e in ext:
                     files.extend(glob.glob(mkdir + '/*.' + e))
 
-                images = [cv.imread(file) for file in files]
-
-                # while len(os.listdir(dirname)) != 0:
-
-                # x = 1
+                images = [cv.imread(file) for file in files] #all the images in the folder are save here
+                #loop for each image
                 for x in images:                    
                     boxes, confidences, classIDs, idxs , results= yolo_v4(x, confidence_threshold=0.5,
                                                                  overlap_threshold=0.2)
@@ -333,29 +336,28 @@ def main():
 
                 for f in os.listdir(mkdir):
                     os.remove(os.path.join(mkdir, f))
-
+                    
+                #data for the graph and the table 
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Pistol', 'Fire', 'Smoke', 'Mask','No-Mask'], 'Number of detection': [violationsnumbers[5],
                      violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Mean Average Precision(mAP)': [f , a, b , c , e , d]}
                 data = pd.DataFrame(data=table_data)
                 st.table(data.head(6))
-
                
-                time.sleep(30)
+                time.sleep(30) # this give time to the system for delete the content of the folder and then go for the loop
+             #Here is the case if user select Video   
             elif choice1 == 'Video':
-
+                #check for each video in the folder with specific video type(mp4)
                 for e in ext:
                     videofiles.extend(glob.glob(mkdir + '/*.' + e))
 
-                # videos = [cv.imread(video) for video in videofiles]
-                # begin video capture
-                
+               
+                # begin video capture for each video ine the folder      
                 for x in videofiles:
                     try:
                         vid = cv.VideoCapture(int(x))
                     except:
                         vid = cv.VideoCapture(x)
-
                     out = None
 
                     # by default VideoCapture returns float instead of int
@@ -395,12 +397,13 @@ def main():
                 for f in os.listdir(mkdir):
                     os.remove(os.path.join(mkdir, f))
 
+                #data for the graph and the table
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Pistol', 'Fire', 'Smoke', 'Mask','No-Mask'], 'Number of detection': [violationsnumbers[5],
                      violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Mean Average Precision(mAP)': [f , a, b , c , e , d]}
                 data = pd.DataFrame(data=table_data)
                 st.table(data.head(6))
-            
+            #Here is the case if user select SOCIAL DISTANCING / MASK 
             elif choice == "SOCIAL DISTANCING / MASK":
                 for e in ext:
                     videofiles.extend(glob.glob(mkdir + '/*.' + e))
@@ -421,7 +424,7 @@ def main():
                     fps = int(vid.get(cv.CAP_PROP_FPS))
                     codec = cv.VideoWriter_fourcc('M', 'J', 'P', 'G')
                     
-
+                    #change the size for better analysis
                     new_height, new_width = height // 2, width // 2
                     
                     out = cv.VideoWriter("./detections/result(%d).avi" % t,
@@ -457,6 +460,8 @@ def main():
                 time.sleep(10)
                 for f in os.listdir(mkdir):
                     os.remove(os.path.join(mkdir, f))
+
+                 #data for the graph and the table   
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Mask',], 'Number of detection': [violationsnumbers[0], violationsnumbers[1]],
                      'Mean Average Precision(mAP)': [f, e]}
