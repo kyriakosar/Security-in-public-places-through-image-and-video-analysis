@@ -253,7 +253,7 @@ def main():
                 return im   
         
     #This function is used for deploy yolov4
-    def yolo_v4(image, confidence_threshold=0.45, overlap_threshold=0.25):
+    def yolo_v4(image, confidence_threshold=0.5, overlap_threshold=0.2):
         # Load the network. Because this is cached it will only happen once.
         @st.cache(allow_output_mutation=True)
         def load_network(config_path, weights_path):
@@ -336,7 +336,7 @@ def main():
 
                 for f in os.listdir(mkdir):
                     os.remove(os.path.join(mkdir, f))
-                    
+
                 #data for the graph and the table 
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Pistol', 'Fire', 'Smoke', 'Mask','No-Mask'], 'Number of detection': [violationsnumbers[5],
