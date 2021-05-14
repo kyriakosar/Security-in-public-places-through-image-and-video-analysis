@@ -309,17 +309,24 @@ def main():
     if session_state.name == "":
         st.subheader("Please select a folder")
     else:
-        st.subheader("Please be patient the detection is running..") 
+        #check if the folder in path is empty
+        folderempty = 0
+        if len(os.listdir(dirname)) == 0:
+            folderempty = 1
+        else:
+            st.subheader("Please be patient the detection is running..") 
         #initialize lists for statistics
         violationsnumbers = [0, 0, 0, 0, 0, 0, 0]
         mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson = [], [], [], [], [], []
+        v=[0]
+        
         #while the folder is not empty do the loop
         while len(os.listdir(dirname)) != 0:
             count += 1
             files = []
             images = []
             t = 0
-            v=[0]
+           
             #Here is the case if user select Image
             if choice1 == 'Image':
                 for e in ext:
@@ -469,14 +476,23 @@ def main():
                 data = pd.DataFrame(data=table_data)
                 st.text("Total videos: %d" % t)
                 st.table(data.head(2))
-        if choice1 == 'Image':               
-            st.text("Total images: %d" % t)            
-            graph(violationsnumbers) 
+        if choice1 == 'Image':
+            if folderempty == 1:
+                st.subheader("Please select a folder with correct data")
+            else:               
+                st.text("Total images: %d" % t)            
+                graph(violationsnumbers) 
         elif choice1 == 'Video':
-            st.text("Total videos: %d" % t)            
-            graph(violationsnumbers)
-        elif choice == 'SOCIAL DISTANCING / MASK': 
-            st.subheader("Social Distancing Violations: %d" %sum(v))
+            if folderempty == 1:
+                st.subheader("Please select a folder with correct data")
+            else:
+                st.text("Total videos: %d" % t)            
+                graph(violationsnumbers)
+        elif choice == 'SOCIAL DISTANCING / MASK':
+            if folderempty == 1:
+                st.subheader("Please select a folder with correct data")
+            else:
+                st.subheader("Social Distancing Violations: %d" %sum(v))
               
 
 main()
