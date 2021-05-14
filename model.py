@@ -319,6 +319,7 @@ def main():
             files = []
             images = []
             t = 0
+            v=[0]
             #Here is the case if user select Image
             if choice1 == 'Image':
                 for e in ext:
@@ -408,7 +409,7 @@ def main():
                 for e in ext:
                     videofiles.extend(glob.glob(mkdir + '/*.' + e))
 
-                v=[0]
+                
                 # begin video capture
                 for x in videofiles:
                     try:
