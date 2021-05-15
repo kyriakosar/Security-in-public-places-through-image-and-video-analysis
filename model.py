@@ -455,7 +455,6 @@ def main():
                                                                      overlap_threshold=0.2)
                         
                         img = cvDrawBoxes(results, violate, idxs, boxes, classIDs, frame_resized, violationsnumbers, mAPmask, mAPperson,v)
-                         
                         
                         if cv.waitKey(1) & 0xFF == ord('q'):
                             break
