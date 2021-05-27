@@ -58,7 +58,7 @@ def main():
         session_state.name = dirname
 
     #the valid formats for videos and images
-    ext = ['png', 'jpg', 'jfif', 'avi', 'mp4',
+    ext = ['png', 'jpg', 'jfif', 'avi', 'mp4','jpeg'
            ]    # Add image formats here
     mkdir = session_state.name
   
@@ -348,7 +348,7 @@ def main():
                 #data for the graph and the table 
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Pistol', 'Fire', 'Smoke', 'Mask','No-Mask'], 'Number of detection': [violationsnumbers[5],
-                     violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Mean Average Precision(mAP)': [f , a, b , c , e , d]}
+                     violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Average Confidence': [f , a, b , c , e , d]}
                 data = pd.DataFrame(data=table_data)
                 st.table(data.head(6))
                
@@ -408,7 +408,7 @@ def main():
                 #data for the graph and the table
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Pistol', 'Fire', 'Smoke', 'Mask','No-Mask'], 'Number of detection': [violationsnumbers[5],
-                     violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Mean Average Precision(mAP)': [f , a, b , c , e , d]}
+                     violationsnumbers[0], violationsnumbers[1],  violationsnumbers[2],  violationsnumbers[4],violationsnumbers[3]], 'Average Confidence': [f , a, b , c , e , d]}
                 data = pd.DataFrame(data=table_data)
                 st.table(data.head(6))
             #Here is the case if user select SOCIAL DISTANCING / MASK 
@@ -436,7 +436,7 @@ def main():
                     new_height, new_width = height // 2, width // 2
                     
                     out = cv.VideoWriter("./detections/result(%d).avi" % t,
-                                         codec, fps, (new_height, new_width), True)    
+                                         codec, fps, (height, width))    
 
                     while vid.isOpened():
                         ret, image = vid.read()
@@ -455,12 +455,13 @@ def main():
                                                                      overlap_threshold=0.2)
                         
                         img = cvDrawBoxes(results, violate, idxs, boxes, classIDs, frame_resized, violationsnumbers, mAPmask, mAPperson,v)
-                        
+                        img_final = cv.resize(img, (width,height))
                         if cv.waitKey(1) & 0xFF == ord('q'):
                             break
                         fps = 1.0 / (time.time() - start_time)
                         print("FPS: %.2f" % fps)
-                        out.write(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+                        st.image(img_final)
+                        out.write(cv.cvtColor(img_final, cv.COLOR_BGR2RGB))
                     vid.release()
                     out.release()
                 cv.destroyAllWindows()
@@ -471,7 +472,7 @@ def main():
                  #data for the graph and the table   
                 a, b , c , d , e, f = calculatemAP(mAPpistol, mAPfire , mAPsmoke, mAPnomask, mAPmask, mAPperson)
                 table_data = {'Detections': ['Person','Mask',], 'Number of detection': [violationsnumbers[0], violationsnumbers[1]],
-                     'Mean Average Precision(mAP)': [f, e]}
+                     'Average Confidence': [f, e]}
                 data = pd.DataFrame(data=table_data)
                 st.text("Total videos: %d" % t)
                 st.table(data.head(2))
