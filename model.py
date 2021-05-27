@@ -460,7 +460,6 @@ def main():
                             break
                         fps = 1.0 / (time.time() - start_time)
                         print("FPS: %.2f" % fps)
-                        st.image(img_final)
                         out.write(cv.cvtColor(img_final, cv.COLOR_BGR2RGB))
                     vid.release()
                     out.release()
