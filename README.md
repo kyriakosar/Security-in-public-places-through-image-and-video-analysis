@@ -42,12 +42,10 @@ fire, smoke(low accuracy), person, mask, no-mask(low accuracy), pistol
 3. When the detection finish the images or videos goes to the detections folder
 4. The images that can not be detected goes to nodetections folder
 
-
-
-## THANK YOU
-## Copyright © Kyriakos Aristidou, 2021
-
-#References
+# References #
 - github.com/theAIGuysCode/YOLOv4-Cloud-Tutorial
 - github.com/AlexeyAB/darknet
 - github.com/tzutalin/labelImg
+
+## THANK YOU
+## Copyright © Kyriakos Aristidou, 2021
