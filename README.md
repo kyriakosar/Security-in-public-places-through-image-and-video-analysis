@@ -33,7 +33,7 @@ streamlit run model.py
 
 ### NOTES AND INSTRUCTIONS ###
 
-## This app can be detect images or video with these objects: ##
+## This app can detect images or video with these objects: ##
 fire, smoke(low accuracy), person, mask, no-mask(low accuracy), pistol 
 
 
@@ -47,4 +47,7 @@ fire, smoke(low accuracy), person, mask, no-mask(low accuracy), pistol
 ## THANK YOU
 ## Copyright © Kyriakos Aristidou, 2021
 
-
+#References
+- github.com/theAIGuysCode/YOLOv4-Cloud-Tutorial
+- github.com/AlexeyAB/darknet
+- github.com/tzutalin/labelImg
